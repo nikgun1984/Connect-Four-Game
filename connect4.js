@@ -89,24 +89,6 @@ function placeInTable(y, x) {
   td.appendChild(disk); 
 }
 
-// /* Animation */
-
-// function myAnimation(e){
-//   let pos = 0;
-
-//   const id = setInterval(frame,10);
-//   function frame(){
-//     if(pos == 560){
-//       clearInterval(id);
-//     } else {
-//       pos += 10;
-//       e.target.style.top = pos + "px";
-
-//     }
-//   }
-
-// }
-
 /** endGame: announce game end */
 
 function endGame(msg) {
@@ -151,19 +133,14 @@ function handleClick(evt) {
       endGame(`You got Tie!!!`);
     }
     // switch currPlayer 1 <-> 2
-    console.log(evt.target);
-    console.log(evt.target.tagName);
     if(evt.target.tagName==='TD'){
       evt.target.firstElementChild.classList.remove('piece',`p${currPlayer}`);
       currPlayer = currPlayer===1?2:1;
       evt.target.firstElementChild.classList.add('piece',`p${currPlayer}`);
     } else if(evt.target.tagName==='DIV'){
       evt.target.classList.remove('piece',`p${currPlayer}`);
-      console.log('remove')
       currPlayer = currPlayer===1?2:1;
-      console.log(currPlayer)
       evt.target.classList.add('piece',`p${currPlayer}`);
-      console.log('add')
     }
   }
 }
