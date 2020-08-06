@@ -7,9 +7,11 @@
 
 const WIDTH = 7;
 const HEIGHT = 6;
-
+const table = document.querySelector('#board');
+const header = document.querySelector('.header');
 let currPlayer = 1; // active player: 1 or 2
 let winner = false;
+let refreshIntervalId;
 const board = []; // array of rows, each row is array of cells  (board[y][x])
 /** makeBoard: create in-JS board structure:
  *    board = array of rows, each row is array of cells  (board[y][x])
@@ -34,7 +36,8 @@ function makeHtmlBoard() {
   // get the top part of the grid slots in order to insert disks to the DOM
   const topSlot = document.createElement("tr");
   topSlot.setAttribute("id", "column-top");
-  
+  topSlot.addEventListener("click", handleClick);
+
   for (let x = 0; x < WIDTH; x++) {
     const headCell = document.createElement("td"),
           div4Disk = document.createElement('div');
@@ -44,16 +47,11 @@ function makeHtmlBoard() {
     headCell.appendChild(div4Disk);
     topSlot.append(headCell);
     headCell.addEventListener('mouseover', function(e){
-      if(Array.from(div4Disk.classList).indexOf('hide')!==-1){
-        div4Disk.classList.remove('hide');
-      }
-
       div4Disk.classList.add('piece',`p${currPlayer}`);
     });
     headCell.addEventListener('mouseout', function(e){
       div4Disk.classList.remove('piece',`p${currPlayer}`);
     });
-    topSlot.addEventListener("click", handleClick);
   }
   htmlBoard.append(topSlot);
 
@@ -112,11 +110,15 @@ function placeInTable(y, x) {
 /** endGame: announce game end */
 
 function endGame(msg) {
-  const congrat = document.createElement('h1');
-  congrat.classList.add('centered','header');
-  const table = document.querySelector('#game');
-  congrat.innerText = msg;
-  table.appendChild(congrat);
+  const resetBtn = document.createElement('button');
+  resetBtn.classList.add('centered', 'reset');
+  header.innerText = msg;
+  refreshIntervalId = setInterval(function(){
+    header.style.color = randomRGB();
+  },100);
+  resetBtn.innerText = 'Reset Game';
+  resetBtn.addEventListener('click',boardReset);
+  table.append(resetBtn);
   winner = true;
 }
 
@@ -125,9 +127,9 @@ function endGame(msg) {
 function handleClick(evt) {
   // get x from ID of clicked cell
   let x;
-  if(evt.target.id){
+  if(evt.target.tagName==='TD'){
     x = +evt.target.id;
-  } else {
+  }else if(evt.target.tagName==='DIV'){
     x = +evt.target.parentElement.id;
   }
   // get next spot in column (if none, ignore click)
@@ -149,11 +151,20 @@ function handleClick(evt) {
       endGame(`You got Tie!!!`);
     }
     // switch currPlayer 1 <-> 2
-    evt.target.classList.remove(`p${currPlayer}`);
-    if(evt.target.tagName==='DIV'){
-      evt.target.classList.add('hide');
+    console.log(evt.target);
+    console.log(evt.target.tagName);
+    if(evt.target.tagName==='TD'){
+      evt.target.firstElementChild.classList.remove('piece',`p${currPlayer}`);
+      currPlayer = currPlayer===1?2:1;
+      evt.target.firstElementChild.classList.add('piece',`p${currPlayer}`);
+    } else if(evt.target.tagName==='DIV'){
+      evt.target.classList.remove('piece',`p${currPlayer}`);
+      console.log('remove')
+      currPlayer = currPlayer===1?2:1;
+      console.log(currPlayer)
+      evt.target.classList.add('piece',`p${currPlayer}`);
+      console.log('add')
     }
-    currPlayer = currPlayer===1?2:1;
   }
 }
 
@@ -190,6 +201,28 @@ function checkForWin() {
       }
     }
   }
+}
+
+function boardReset(){
+  for(let i = 0;i<HEIGHT;i++){
+    for(let j = 0;j<WIDTH;j++){
+      board[i][j] = null;
+    }
+  }
+  document.querySelector('#board').querySelectorAll('*').forEach(n=>n.remove());
+  winner = false;
+  header.innerText = "Welcome to Connect Four";
+  header.style.color = 'white';
+  clearInterval(refreshIntervalId);
+  makeBoard();
+  makeHtmlBoard();
+}
+
+function randomRGB(){
+  const r = Math.floor(Math.random()*256);
+  const g = Math.floor(Math.random()*256);
+  const b = Math.floor(Math.random()*256);
+  return `rgb(${r},${g},${b})`;
 }
 
 makeBoard();
