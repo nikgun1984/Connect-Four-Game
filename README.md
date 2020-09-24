@@ -4,4 +4,4 @@
 a color and then take turns dropping colored discs into a seven-column. I used. 
 Front-End, Javascript, CSS, HTML with some animations. Hope you will enjoy it!!!  
 
-Go Check out this game  https://nikgun1984.github.io/Connect-Four-Game/
+> Go Check out this game  https://nikgun1984.github.io/Connect-Four-Game/
